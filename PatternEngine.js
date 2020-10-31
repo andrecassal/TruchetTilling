@@ -82,39 +82,58 @@ class Arcs extends RenderEngine{
 }
 
 
-let TEXT = "You ask, what is our policy? I can say: It is to wage war, by sea, land and air, with all our might and with all the strength that God can give us; to wage war against a monstrous tyranny, never surpassed in the dark, lamentable catalogue of human crime. That is our policy.";
-TEXT = TEXT.replace(/[,;!?:.]/ig,"");
-TEXT = TEXT.toUpperCase();
-let ti=0;
-let SPACE = " ";
+
 class TextBlocks extends RenderEngine{
+	constructor(){
+		super();
+		this.SPACE = " ";
+		this.index=0;
+		this.re =  /[,;!?:.]/ig;
+		this.content="You ask, what is our policy? I can say: It is to wage war, by sea, land and air, with all our might and with all the strength that God can give us; to wage war against a monstrous tyranny, never surpassed in the dark, lamentable catalogue of human crime. That is our policy.",	
+		this.content = this.content.toUpperCase();
+		this.content = this.content.replace(this.re,"");
+	}
+	next(){
+		if(this.index >= this.content.length){
+			this.index=0;
+			return this.SPACE;
+		}
+		return this.content[this.index++];
+	}
+	text(){
+		let T = this.next();
+		if(this.xi == 0 && T == this.SPACE){
+			T = this.next();
+		}
+		return T;
+	}
 	render(){
 		let B = this.blk;
 		let F = this.blk * 0.6;
-		let T = TEXT[ti++];
-		if(this.xi == 0 && T == SPACE){
-			T = TEXT[ti++];
-		}
+		let T = this.text();
+		let bg = this.fg;
+		let fg = this.bg;
 		
 		push();
-		noFill();
-		stroke(0);
-		if(T == SPACE){
-			fill(0);
-			rect(0,0, B,B);
-		}else if(T){
+		if(this.intensity < 90){
+			fg = this.fg;
+			bg = this.bg;
+		}
+			
+		if(T){
+			stroke(0);
+			fill(bg);
 			rect(0,0, B,B);
 			textAlign(CENTER,CENTER);
 			textSize(F);
 			textStyle(BOLD);
-			fill(0);
+			fill(fg);
 			noStroke();
 			text(T,this.blk2,this.blk2)
 		}
 		pop();
 	}
 }
-
 
 class LineBlock extends RenderEngine{
 	render(){
@@ -128,7 +147,6 @@ class LineBlock extends RenderEngine{
 					T,H);
 	}
 }
-
 
 class DoubleDots extends RenderEngine{
 	render(){
@@ -145,6 +163,24 @@ class DoubleDots extends RenderEngine{
 		translate(this.blk2,this.blk2);
 		ellipseMode(CENTER);
 		ellipse(0,0, B, B);
+	}
+}
+
+class BrushLines extends RenderEngine{
+	render(){
+		noStroke();
+		fill(0);
+		let M1 = this.blk * 0.1;
+		let M2 = this.blk * 0.4;
+		let ii = map(this.intensity,0,255,M2,M1)
+		ellipseMode(CENTER);
+		let x = this.blk2;
+		let w = this.blk * 0.1;
+		let s = 0;
+		for(let y=0;y<=this.blk;y+=random(3)){
+			s = ii + random(M1);
+			ellipse(x+random(-w,w), y, s, s)
+		}
 	}
 }
 
@@ -628,7 +664,6 @@ class AngledLines extends RenderEngine{
 	}
 }
 
-
 class AngledLines2 extends RenderEngine{
 	render(){
 		let A = this.blk;
@@ -656,7 +691,6 @@ class AngledLines3 extends RenderEngine{
 		line(0,0, B,B);
 	}
 }
-
 
 
 class AngledQuads extends RenderEngine{
@@ -756,35 +790,6 @@ class CairoPentagons extends PatternBlock{
 		this.base(0);
 	}
 	
-}
-
-
-class Diamonds2 extends PatternBlock{
-	base(side){
-		let M1 = this.blk * 0.01;
-		let M2 = this.blk * 0.6;
-		stroke(255);
-		strokeWeight(1);
-		noFill();
-		if(this.xi%2){
-			scale(-1,1)
-			translate(-this.blk,0);
-		}
-		if(this.yi%2){
-			scale(1,-1)
-			translate(0,this.blk);
-		}
-		let s = new PatternSquare(0,0,this.blk,this.blk)
-		s.density = map(this.intensity,0,255,M2,M1);
-		s.angle = QUARTER_PI;
-		s.render()
-	}
-	L2R(){
-		this.base(0);
-	}
-	R2L(){
-		this.base(1);
-	}
 }
 
 
