@@ -643,6 +643,20 @@ class AngledLines2 extends RenderEngine{
 	}
 }
 
+class AngledLines3 extends RenderEngine{
+	render(){
+		let B = this.blk;
+		let S1 = B*0.6;
+		let S2 = 1
+		let S = map(this.intensity,0,255,S1,S2)
+		
+		stroke(0);
+		strokeWeight(S)
+		line(0,0, 0,B)
+		line(0,0, B,B);
+	}
+}
+
 
 
 class AngledQuads extends RenderEngine{
