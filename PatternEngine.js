@@ -2,14 +2,29 @@ class RenderEngine{
 	constructor(){
 		this.blk = null;
 		this.blk2 = null;
+		this.blkWidth=null;
+		this.blkWidth2=null;
+		this.blkHeight=null;
+		this.blkHeight2=null;
 		this.intensity=1;
 		this.bg = color(0);
 		this.fg = color(255);
 	}
-	setBlk(blk){
-		this.blk = blk;
-		this.blk2 = blk/2;
-	}
+	setBlk(blkOrWidth=50,blkHeight){
+		this.w = this.w || width;
+		this.h = this.h || height;
+		this.blk = blkOrWidth;
+		this.blk2 = this.blk/2;
+		this.blkWidth = blkOrWidth;
+		this.blkWidth2 = blkOrWidth/2;
+		this.blkHeight = blkHeight || blkOrWidth;
+		this.blkHeight2 = this.blkHeight/2;
+	}	
+	setImage(img){
+		this.img = img;
+		this.w = img.width;
+		this.h = img.height;
+	}	
 	base(bgOrFg){
 		let bg = bgOrFg ? this.fg : this.bg;
 		let fg = bgOrFg ? this.bg : this.fg;
@@ -83,19 +98,27 @@ class Arcs extends RenderEngine{
 
 
 
-class TextBlocks extends RenderEngine{
-	constructor(){
+class SpeechBlocks extends RenderEngine{
+	constructor(speech='lincoln'){
 		super();
 		this.SPACE = " ";
 		this.index=0;
 		this.re =  /[,;!?:.]/ig;
-		this.content="You ask, what is our policy? I can say: It is to wage war, by sea, land and air, with all our might and with all the strength that God can give us; to wage war against a monstrous tyranny, never surpassed in the dark, lamentable catalogue of human crime. That is our policy.",	
+		this.restart = false;
+		this.speeches={
+			lincoln:"Four score and seven years ago our fathers brought forth on this continent, a new nation, conceived in Liberty, and dedicated to the proposition that all men are created equal. Now we are engaged in a great civil war, testing whether that nation, or any nation so conceived and so dedicated, can long endure. We are met on a great battle-field of that war. We have come to dedicate a portion of that field, as a final resting place for those who here gave their lives that that nation might live. It is altogether fitting and proper that we should do this. But, in a larger sense, we can not dedicate—we can not consecrate—we can not hallow—this ground. The brave men, living and dead, who struggled here, have consecrated it, far above our poor power to add or detract. The world will little note, nor long remember what we say here, but it can never forget what they did here. It is for us the living, rather, to be dedicated here to the unfinished work which they who fought here have thus far so nobly advanced. It is rather for us to be here dedicated to the great task remaining before us—that from these honored dead we take increased devotion to that cause for which they gave the last full measure of devotion—that we here highly resolve that these dead shall not have died in vain—that this nation, under God, shall have a new birth of freedom—and that government of the people, by the people, for the people, shall not perish from the earth.",
+			che:"You ask, what is our policy? I can say: It is to wage war, by sea, land and air, with all our might and with all the strength that God can give us; to wage war against a monstrous tyranny, never surpassed in the dark, lamentable catalogue of human crime. That is our policy.",
+		}
+		this.content = this.speeches[speech];
 		this.content = this.content.toUpperCase();
-		this.content = this.content.replace(this.re,"");
+		// this.content = this.content.replace(this.re,"");
+		this.intensityTarget = 120;
 	}
 	next(){
 		if(this.index >= this.content.length){
-			this.index=0;
+			if(this.restart){
+				this.index=0;
+			}
 			return this.SPACE;
 		}
 		return this.content[this.index++];
@@ -108,28 +131,29 @@ class TextBlocks extends RenderEngine{
 		return T;
 	}
 	render(){
-		let B = this.blk;
-		let F = this.blk * 0.6;
+		let W = this.blkWidth;
+		let H = this.blkHeight;
+		let F = W * 0.7;
 		let T = this.text();
 		let bg = this.fg;
 		let fg = this.bg;
 		
 		push();
-		if(this.intensity < 90){
+		if(this.intensity < this.intensityTarget){
 			fg = this.fg;
 			bg = this.bg;
 		}
 			
 		if(T){
-			stroke(0);
+			noStroke(0);
 			fill(bg);
-			rect(0,0, B,B);
+			rect(0,0, W,H);
 			textAlign(CENTER,CENTER);
 			textSize(F);
 			textStyle(BOLD);
 			fill(fg);
 			noStroke();
-			text(T,this.blk2,this.blk2)
+			text(T,W/2,H/2)
 		}
 		pop();
 	}
